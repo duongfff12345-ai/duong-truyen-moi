@@ -1,144 +1,170 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-<!DOCTYPE html>
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>AI Voice Truyện</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Voice Truyện - Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #2193b0;
+            --secondary-color: #6dd5ed;
+            --text-color: #2c3e50;
+            --bg-gradient: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+        }
 
-<style>
+        body {
+            font-family: 'Inter', sans-serif; /* Phông chữ Inter cực đẹp cho web */
+            background: var(--bg-gradient);
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-color);
+        }
 
-body{
-font-family: Arial;
-background: linear-gradient(135deg,#6dd5ed,#2193b0);
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-}
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
 
-.container{
-background:white;
-padding:40px;
-border-radius:15px;
-width:520px;
-text-align:center;
-box-shadow:0 0 15px rgba(0,0,0,0.2);
-}
+        h2 {
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: #1a2a3a;
+            letter-spacing: -1px;
+        }
 
-textarea{
-width:100%;
-height:140px;
-padding:10px;
-font-size:14px;
-margin-bottom:15px;
-}
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 15px;
+            font-size: 15px;
+            border: 2px solid #eef2f3;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            font-family: inherit;
+            transition: border-color 0.3s;
+            outline: none;
+            resize: none;
+        }
 
-select{
-width:260px;
-padding:8px;
-margin-bottom:15px;
-}
+        textarea:focus {
+            border-color: var(--primary-color);
+        }
 
-button{
-background:#2193b0;
-color:white;
-border:none;
-padding:10px 25px;
-border-radius:6px;
-cursor:pointer;
-}
+        select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid #eef2f3;
+            background-color: #f8fbff;
+            font-size: 15px;
+            margin-bottom: 25px;
+            cursor: pointer;
+            outline: none;
+            font-family: inherit;
+        }
 
-button:hover{
-background:#197a91;
-}
+        button {
+            background: linear-gradient(to right, #2193b0, #6dd5ed);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(33, 147, 176, 0.3);
+        }
 
-audio{
-margin-top:20px;
-width:100%;
-}
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(33, 147, 176, 0.4);
+            filter: brightness(1.1);
+        }
 
-</style>
+        .result-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px dashed #eef2f3;
+        }
 
+        audio {
+            width: 100%;
+            border-radius: 8px;
+        }
+
+        .btn-download {
+            background: #27ae60;
+            margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .btn-download:hover {
+            background: #2ecc71;
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+        }
+
+        /* Responsive cho điện thoại */
+        @media (max-width: 480px) {
+            .container {
+                width: 85%;
+                padding: 25px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
 <div class="container">
+    <h2>🎙️ AI Voice Truyện</h2>
 
-<h2>AI Voice Truyện YouTube</h2>
+    <form action="/create_audio" method="post">
+        <textarea name="text" placeholder="Dán đoạn truyện vào đây..." required></textarea>
+        
+        <select name="voice">
+            <option value="nu_truyen">🌸 Nữ truyện nhẹ</option>
+            <option value="nu_ke">📖 Nữ kể chuyện</option>
+            <option value="nu_bac">❄️ Nữ miền Bắc</option>
+            <option value="nu_nam">☀️ Nữ miền Nam</option>
+            <option value="nam_tram">🪵 Nam truyện trầm</option>
+            <option value="nam_ke">🎙️ Nam kể chuyện</option>
+            <option value="nam_bac">🏛️ Nam miền Bắc</option>
+            <option value="nam_nam">🌊 Nam miền Nam</option>
+            <option value="nu_halazy">✨ Nữ truyện (Halazy Audio)</option>
+            <option value="nu_story_youtube">📺 Nữ kể chuyện YouTube</option>
+        </select>
 
-<form action="/create_audio" method="post">
+        <button type="submit">⚡ Tạo File Audio</button>
+    </form>
 
-<textarea name="text" placeholder="Dán đoạn truyện vào đây..." required></textarea>
+    {% if audio %}
+    <div class="result-section">
+        <audio controls autoplay>
+            <source src="/download">
+            Trình duyệt của bạn không hỗ trợ audio.
+        </audio>
 
-<br>
-
-<select name="voice">
-
-<option value="nu_truyen">Nữ truyện nhẹ</option>
-
-<option value="nu_ke">Nữ kể chuyện</option>
-
-<option value="nu_bac">Nữ miền Bắc</option>
-
-<option value="nu_nam">Nữ miền Nam</option>
-
-
-<option value="nam_tram">Nam truyện trầm</option>
-
-<option value="nam_ke">Nam kể chuyện</option>
-
-<option value="nam_bac">Nam miền Bắc</option>
-
-<option value="nam_nam">Nam miền Nam</option>
-
-<option value="nu_halazy">Nữ truyện (giống Halazy Audio)</option>
-
-<option value="nu_story_youtube">Nữ kể chuyện YouTube (video 2)</option>
-
-
-</select>
-
-<br>
-
-<button type="submit">Tạo MP3</button>
-
-</form>
-
-{% if audio %}
-
-<audio controls>
-<source src="/download">
-</audio>
-
-<br><br>
-
-<a href="/download">
-<button>Tải MP3</button>
-</a>
-
-{% endif %}
-
+        <a href="/download" style="text-decoration: none;">
+            <button class="btn-download">💾 Tải MP3 Về Máy</button>
+        </a>
+    </div>
+    {% endif %}
 </div>
 
 </body>
 </html>
-
-
-
-
-
-</body>
-
-</html>
-</body>
-</html>
-
-
