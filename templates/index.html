@@ -1,46 +1,116 @@
-<script>
-async function createAudio() {
-    const btn = document.getElementById('mainBtn');
-    const loadingIcon = document.getElementById('loadingIcon');
-    const btnText = document.getElementById('btnText');
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Audio Studio Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .cursor-blink { animation: blink 1s step-end infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen py-10 px-4 flex items-center justify-center font-sans">
+    <div class="max-w-4xl w-full bg-white rounded-3xl shadow-2xl p-8 border border-slate-200">
+        <h1 class="text-3xl font-black text-slate-800 mb-6 flex items-center">
+            <i class="fas fa-bolt text-yellow-500 mr-3"></i> AI Audio Speed Pro
+        </h1>
 
-    const text = document.getElementById('text').value;
-    if(!text.trim()) return alert("Văn bản trống!");
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 space-y-5">
+                <textarea id="text" rows="10" class="w-full p-5 rounded-2xl border-none ring-1 ring-slate-200 focus:ring-2 focus:ring-indigo-500 shadow-inner outline-none text-lg" placeholder="Dán nội dung truyện vào đây..."></textarea>
+                <button onclick="createAudio()" id="mainBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-5 rounded-2xl shadow-lg transition-all flex items-center justify-center space-x-3">
+                    <div id="loadingIcon" class="hidden w-6 h-6 border-4 border-slate-200 border-t-indigo-200 rounded-full animate-spin"></div>
+                    <span id="btnText">CHUYỂN ĐỔI TỐC ĐỘ CAO</span>
+                </button>
+            </div>
 
-    btn.disabled = true;
-    loadingIcon.classList.remove('hidden');
-    btnText.innerText = "ĐANG XỬ LÝ...";
+            <div class="space-y-6">
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4 shadow-sm">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-2 uppercase">Giọng đọc</label>
+                        <select id="voice" class="w-full p-3 rounded-xl bg-white border border-slate-200 outline-none focus:ring-2 focus:ring-indigo-500">
+                            {% for key, label in voices.items() %}
+                            <option value="{{ key }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-tighter">Tốc độ: <span id="speedVal" class="text-indigo-600">1.0</span>x</label>
+                        <input type="range" id="speed" min="0.5" max="1.5" step="0.05" value="1.0" class="w-full h-2 bg-slate-200 rounded-lg appearance-none accent-indigo-600">
+                    </div>
+                </div>
+                <div id="terminal" class="bg-slate-900 rounded-2xl p-4 h-40 overflow-y-auto font-mono text-[11px] text-green-400 space-y-1 shadow-2xl border border-slate-800">
+                    <p class="text-slate-500">> Turbo Mode Ready...<span class="cursor-blink">_</span></p>
+                </div>
+            </div>
+        </div>
 
-    const fd = new FormData();
-    fd.append('text', text);
-    fd.append('voice', document.getElementById('voice').value);
-    fd.append('speed', document.getElementById('speed').value);
+        <div id="playerCard" class="mt-8 hidden bg-slate-900 rounded-2xl p-6 text-white flex flex-col md:flex-row items-center gap-6 border-l-8 border-indigo-500 animate-pulse">
+            <div class="flex-1 w-full text-center md:text-left">
+                <p class="text-indigo-400 text-xs font-bold uppercase mb-2 italic">✓ Xong! Đã tối ưu tốc độ.</p>
+                <audio id="audioElement" controls class="w-full h-10"></audio>
+            </div>
+            <a id="dlLink" href="#" download class="bg-indigo-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-indigo-500 transition shadow-lg shrink-0 flex items-center">
+                <i class="fas fa-download mr-2"></i> TẢI FILE MP3
+            </a>
+        </div>
+    </div>
 
-    try {
-        const res = await fetch('/generate', { method: 'POST', body: fd });
+    <script>
+        document.getElementById('speed').oninput = function() { document.getElementById('speedVal').innerText = this.value; };
 
-        let data;
-        try {
-            data = await res.json();
-        } catch {
-            const textErr = await res.text();
-            throw new Error("Server lỗi (trả HTML): " + textErr);
+        function log(msg, type = 'info') {
+            const term = document.getElementById('terminal');
+            const color = type === 'error' ? 'text-red-400' : (type === 'success' ? 'text-indigo-400' : 'text-green-400');
+            term.innerHTML += `<p class="${color}">[${new Date().toLocaleTimeString([], {hour12: false})}] ${msg}</p>`;
+            term.scrollTop = term.scrollHeight;
         }
 
-        if(data.audio_url) {
-            document.getElementById('audioElement').src = data.audio_url + "?v=" + Date.now();
-            document.getElementById('dlLink').href = data.audio_url;
-            document.getElementById('playerCard').classList.remove('hidden');
-        } else {
-            throw new Error(data.error);
-        }
+        async function createAudio() {
+            const btn = document.getElementById('mainBtn');
+            const loadingIcon = document.getElementById('loadingIcon');
+            const btnText = document.getElementById('btnText');
+            const text = document.getElementById('text').value;
+            const playerCard = document.getElementById('playerCard');
+            const originalTitle = document.title;
 
-    } catch (e) {
-        alert("Lỗi: " + e.message);
-    } finally {
-        btn.disabled = false;
-        loadingIcon.classList.add('hidden');
-        btnText.innerText = "CHUYỂN ĐỔI";
-    }
-}
-</script>
+            if(!text.trim()) return log("Lỗi: Văn bản trống!", "error");
+
+            document.title = "⌛ Đang xử lý tốc độ cao...";
+            btn.disabled = true;
+            btn.classList.add('bg-slate-500');
+            loadingIcon.classList.remove('hidden');
+            btnText.innerText = "TURBO PROCESSING...";
+            playerCard.classList.add('hidden');
+
+            log("Kích hoạt chế độ tải đa luồng song song...");
+
+            const fd = new FormData();
+            fd.append('text', text);
+            fd.append('voice', document.getElementById('voice').value);
+            fd.append('speed', document.getElementById('speed').value);
+
+            try {
+                const res = await fetch('/generate', { method: 'POST', body: fd });
+                const data = await res.json();
+                if(data.audio_url) {
+                    log("Hoàn tất siêu tốc!", "success");
+                    document.getElementById('audioElement').src = data.audio_url + "?v=" + Date.now();
+                    document.getElementById('dlLink').href = data.audio_url;
+                    playerCard.classList.remove('hidden');
+                    document.title = "✅ Hoàn tất!";
+                } else { throw new Error(data.error); }
+            } catch (e) {
+                log("Lỗi: " + e.message, "error");
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('bg-slate-500');
+                loadingIcon.classList.add('hidden');
+                btnText.innerText = "CHUYỂN ĐỔI TỐC ĐỘ CAO";
+                setTimeout(() => { document.title = originalTitle; }, 3000);
+            }
+        }
+    </script>
+</body>
+</html>
